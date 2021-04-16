@@ -2,7 +2,9 @@ import re
 import sys
 
 doc='''
-   -NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
+i guess we write stuff like so:
+NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
+
 --myintarg int default:12   blabla
 --something    we will assume that it is a bool i think
 --mystring str default:asd  blabla
@@ -19,11 +21,11 @@ def docstrparser(docstring):
     args={}
     argfun={}
     for line in docstring.split('\n'):
-        if line and line[0]=='-':
+        line= line.strip()
+        if line and line[:2]=='--':
             line = line.split("  ")[0]
-            print(line)
             m=getgroups.match(line)
-            print('grps',m.group(1),m.group(2),m.group(4))
+            #print('grps',m.group(1),m.group(2),m.group(4))
             # lets read the groups 
             name = m.group(1)
             argfun[name] = eval(m.group(2)) if m.group(2) else bool # set type
@@ -33,34 +35,40 @@ def docstrparser(docstring):
 
 
 def argparser(args):
+    '''
+    returns {arg:string}
+    '''
     result = {}
     carg = None
     cstuff = ''
     for e in args:
         if e[0]== '-':
-            if carg:result[carg] = cstuff 
+            if carg:result[carg] = cstuff.strip()
             carg = e[2:]
         else:
             cstuff+=e
-    if carg:result[carg] = cstuff
+    if carg:result[carg] = cstuff.strip()
     return result
 
-
+class argz:
+    def __init__(self,stuff):
+        self.__dict__.update(stuff)
 
 def parse( docstring , args =  sys.argv[1:]):
     resargs, argfun = docstrparser(docstring)
     rawargs = argparser(args)
+
+    if resargs.get('h',False) or resargs.get('help',False):
+        print(docstring)
+
     for k,v in rawargs.items():
-        if argfun.get(k,False) == bool: 
+        if v == '':
             resargs[k] = True
         elif k in argfun:
             resargs[k] = argfun[k](v)
-        else:
-            print(f'{k} is unknown but ill add it anyway... ')
-            resargs[k] = True
-    if resargs.get('h',False): # should work
-        print(docstring)
-    return resargs
+    
+    
+    return argz(resargs)
 
 if __name__ == '__main__':
     print(parse(doc))
