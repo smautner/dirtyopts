@@ -8,6 +8,7 @@ NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
 --myintarg int default:12   blabla
 --something    we will assume that it is a bool i think
 --mystring str default:asd  blabla
+--myfu eval default: lambda x:x 
 '''
 
 #REGEX:
@@ -15,7 +16,7 @@ NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
 #1:type
 #2: NOTHIG
 #3:defaultvalue
-getgroups = re.compile( '--([\w]+) ?([\w]+)? ?(default:(\w+))? ?')
+getgroups = re.compile( '--([\w]+) ?([\w]+)? ?(default:(.+))? ?')
 
 def docstrparser(docstring):
     args={}
@@ -71,4 +72,4 @@ def parse( docstring , args =  sys.argv[1:]):
     return argz(resargs)
 
 if __name__ == '__main__':
-    print(parse(doc))
+    print(parse(doc).__dict__)
