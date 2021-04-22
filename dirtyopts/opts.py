@@ -44,7 +44,9 @@ def argparser(args):
     cstuff = ''
     for e in args:
         if e[0]== '-':
-            if carg:result[carg] = cstuff.strip()
+            if carg:
+                result[carg] = cstuff.strip()
+                cstuff = ''
             carg = e[2:]
         else:
             cstuff+=e
@@ -58,10 +60,9 @@ class argz:
 def parse( docstring , args =  sys.argv[1:]):
     resargs, argfun = docstrparser(docstring)
     rawargs = argparser(args)
-
     if resargs.get('h',False) or resargs.get('help',False):
         print(docstring)
-
+    
     for k,v in rawargs.items():
         if v == '':
             resargs[k] = True
