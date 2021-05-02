@@ -9,6 +9,7 @@ NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
 --something    we will assume that it is a bool i think
 --mystring str default:asd  blabla
 --myfu eval default: lambda x:x 
+--another bool default:True
 '''
 
 #REGEX:
@@ -62,15 +63,14 @@ def parse( docstring , args =  sys.argv[1:]):
     rawargs = argparser(args)
 
     for arg,v in rawargs.items():
-        
         if arg in defaultargs:
             if v == '':
-                defaultargs[arg] = True
+                defaultargs[arg] = not defaultargs[arg]
             elif k in argfun:
                 defaultargs[arg] = argfun[arg](v)
 
 
-    return argz(resargs)
+    return argz(defaultargs)
 
 if __name__ == '__main__':
     print(parse(doc).__dict__)
