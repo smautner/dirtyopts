@@ -58,18 +58,18 @@ class argz:
         self.__dict__.update(stuff)
 
 def parse( docstring , args =  sys.argv[1:]):
-    resargs, argfun = docstrparser(docstring)
+    defaultargs, argfun = docstrparser(docstring)
     rawargs = argparser(args)
-    if resargs.get('h',False) or resargs.get('help',False):
-        print(docstring)
-    
-    for k,v in rawargs.items():
-        if v == '':
-            resargs[k] = True
-        elif k in argfun:
-            resargs[k] = argfun[k](v)
-    
-    
+
+    for arg,v in rawargs.items():
+        
+        if arg in defaultargs:
+            if v == '':
+                defaultargs[arg] = True
+            elif k in argfun:
+                defaultargs[arg] = argfun[arg](v)
+
+
     return argz(resargs)
 
 if __name__ == '__main__':
