@@ -44,7 +44,7 @@ def argparser(args):
     carg = None
     cstuff = ''
     for e in args:
-        if e[0]== '-':
+        if e[:2]== '--':
             if carg:
                 result[carg] = cstuff.strip()
                 cstuff = ''
