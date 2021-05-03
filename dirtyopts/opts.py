@@ -66,7 +66,7 @@ def parse( docstring , args =  sys.argv[1:]):
         if arg in defaultargs:
             if v == '':
                 defaultargs[arg] = not defaultargs[arg]
-            elif k in argfun:
+            elif arg in argfun:
                 defaultargs[arg] = argfun[arg](v)
 
 
