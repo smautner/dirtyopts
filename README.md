@@ -5,8 +5,8 @@
 from dirtyopts import parse
 
 doc = '''
-#--argname type[+ for list] [default:defaultarg]  [doublespace -> comment]
---intarg int+ default:3 4 5  i am a comment
+#--argname type[+ for list] [default]  [doublespace -> comment]
+--intarg int+ 3 4 5  i am a comment
 
 # nodefault means the default of the type 
 --strarg str  ->''

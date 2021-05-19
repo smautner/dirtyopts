@@ -5,12 +5,12 @@ doc='''
 i guess we write stuff like so:
 NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
 
---myintarg int default:12   blabla
---mystring str default:asd  blabla
---myfu eval default:lambda x:x 
---another bool default:True
+--myintarg int 12   blabla
+--mystring str asd  blabla
+--myfu eval lambda x:x 
+--another bool True
 --zomg int+
---anotherf bool+ default:False False
+--anotherf bool+ False False
 '''
 
 
@@ -22,13 +22,12 @@ NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
 
 
 #REGEX:
-#1:name
-#2:type
-#3:list?
-#4: NOTHIG
-#5:defaultvalue
-getgroups = re.compile( '--([\w]+) ?(\w+)?(\+)? ?(default:(.+))? ?')
+#1:name #2:type #3:list?  #4: NOTHIG #5:defaultvalue
+#getgroups = re.compile( '--([\w]+) ?(\w+)?(\+)? ?(default:(.+))? ?')
 
+#NEW REGEX
+# 1:argname, 2:type 3:+ 4: default
+getgroups = re.compile('--([\w]+) (\w+)(\+)? ?(.+)?')
 
 def interpret_groups(argname, maker, islist, default, defaults, funcs):
     if maker == 'bool':
@@ -59,7 +58,7 @@ def docstrparser(docstring):
         if line and line[:2]=='--':
             line = line.split("  ")[0]
             m=getgroups.match(line)
-            interpret_groups(*[m.group(x) for x in [1,2,3,5]], defaults, argfun)
+            interpret_groups(*[m.group(x) for x in [1,2,3,4]], defaults, argfun)
     # bool(None) is false so this is fine
     return defaults, argfun
 
@@ -108,7 +107,7 @@ def parse(docstring , args =  sys.argv[1:]):
 
     for arg,v in rawargs.items():
         if arg not in argfun:
-            logging.warningt (f"this docstring doesnt handle: {arg}")
+            logging.warning(f"this docstring doesnt handle: {arg}")
         else:
             defaultargs[arg] = argfun[arg](v)
 
