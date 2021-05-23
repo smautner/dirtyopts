@@ -11,6 +11,9 @@ NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
 --another bool True
 --zomg int+
 --anotherf bool+ False False
+
+
+#--help and -h are SPECIAL NOW :) 
 '''
 
 
@@ -101,10 +104,10 @@ class argz:
 
 
 def parse(docstring , args =  sys.argv[1:]):
+    if "-h" in args or "--help" in args:
+        print (docstring)
     rawargs = argparser(args)
     defaultargs, argfun = docstrparser(docstring)
-
-
     for arg,v in rawargs.items():
         if arg not in argfun:
             logging.warning(f"this docstring doesnt handle: {arg}")
