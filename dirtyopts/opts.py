@@ -13,6 +13,7 @@ NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
 --anotherf bool+ False False
 
 #--help and -h are SPECIAL NOW :) 
+#w1 at the beginning triggers debug mode
 '''
 
 
@@ -32,8 +33,17 @@ NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
 getgroups = re.compile('--([\w]+) (\w+)(\+)? ?(.+)?')
 
 def interpret_groups(argname, maker, islist, default, defaults, funcs):
+    
+    def boolbuilder(x=None):
+        if x in [None,'False']:
+            return False
+        if x in ["True"]:
+            return True
+        assert False, f"i dont know how to turn {x} into a bool"
+            
+
     if maker == 'bool':
-        makerf=lambda x: x=='True'
+        makerf= boolbuilder # bool("False") is true so we dont do that :) 
     else:
         makerf=eval(maker)
 
@@ -52,7 +62,7 @@ def interpret_groups(argname, maker, islist, default, defaults, funcs):
 
 
 
-def docstrparser(docstring):
+def docstrparser(docstring, debug):
     defaults={}
     argfun={}
     for line in docstring.split('\n'):
@@ -61,9 +71,12 @@ def docstrparser(docstring):
             line = line.split("  ")[0]
             m=getgroups.match(line)
             matched = [m.group(x) for x in [1,2,3,4]]
-            #assert  None not in [m.group(x) for x in [1,2,4]], f"DOCSTRING MALFORMATED IN LINE:{line}"
+            if debug: 
+                print ("matches:", matched)
             
             interpret_groups(*matched, defaults, argfun)
+            if debug: 
+                print ("default:", defaults[matched[0]] )
     # bool(None) is false so this is fine
     return defaults, argfun
 
@@ -77,7 +90,7 @@ def app(res,carg,cstuff):
     res[carg] = cstuff
     return []
 
-def argparser(args):
+def argparser(args, debug):
     '''
     returns {argname:list}
     '''
@@ -93,6 +106,9 @@ def argparser(args):
             cstuff.append(e)
     if carg:
         cstuff = app(result,carg, cstuff)
+    if debug:
+        print(args)
+        print(result)
     return result
 
 
@@ -108,15 +124,21 @@ class argz:
 def parse(docstring , args =  sys.argv[1:], debug=False):
     if "-h" in args or "--help" in args:
         print (docstring)
+    if args and args[0] == 'w1':
         debug = True
-    rawargs = argparser(args)
-    defaultargs, argfun = docstrparser(docstring)
+        args = args[1:]
+
+    
+    rawargs = argparser(args, debug)
+    defaultargs, argfun = docstrparser(docstring, debug)
 
     for arg,v in rawargs.items():
         if arg not in argfun:
             if debug: logging.warning(f"this docstring doesnt handle: {arg}")
         else:
+            assert v , f'given arg: "{arg}" is {v}  you musst give an explicit value!' 
             defaultargs[arg] = argfun[arg](v)
+            if debug: print (f"overwritining {arg}  got:{v}  ->: {defaultargs[arg]}")
 
     return argz(defaultargs)
 

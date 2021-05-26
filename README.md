@@ -18,6 +18,8 @@ doc = '''
 doc2 = '''
 # i ignore unknown args so multiple args opbjects can be created neatly
 --intargford2 int
+
+# also giving w1 as an arg will trigger verbose mode
 '''
 
 args = parse(doc)
