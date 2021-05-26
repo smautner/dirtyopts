@@ -7,11 +7,10 @@ NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
 
 --myintarg int 12   blabla
 --mystring str asd  blabla
---myfu eval lambda x:x 
+--myfu eval lambda x:x.max()
 --another bool True
 --zomg int+
 --anotherf bool+ False False
-
 
 #--help and -h are SPECIAL NOW :) 
 '''
@@ -61,7 +60,10 @@ def docstrparser(docstring):
         if line and line[:2]=='--':
             line = line.split("  ")[0]
             m=getgroups.match(line)
-            interpret_groups(*[m.group(x) for x in [1,2,3,4]], defaults, argfun)
+            matched = [m.group(x) for x in [1,2,3,4]]
+            #assert  None not in [m.group(x) for x in [1,2,4]], f"DOCSTRING MALFORMATED IN LINE:{line}"
+            
+            interpret_groups(*matched, defaults, argfun)
     # bool(None) is false so this is fine
     return defaults, argfun
 
@@ -103,14 +105,16 @@ class argz:
         self.__dict__.update(stuff)
 
 
-def parse(docstring , args =  sys.argv[1:]):
+def parse(docstring , args =  sys.argv[1:], debug=False):
     if "-h" in args or "--help" in args:
         print (docstring)
+        debug = True
     rawargs = argparser(args)
     defaultargs, argfun = docstrparser(docstring)
+
     for arg,v in rawargs.items():
         if arg not in argfun:
-            logging.warning(f"this docstring doesnt handle: {arg}")
+            if debug: logging.warning(f"this docstring doesnt handle: {arg}")
         else:
             defaultargs[arg] = argfun[arg](v)
 
