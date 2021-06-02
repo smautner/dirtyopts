@@ -23,31 +23,16 @@ NAMEOFTHING [TYPE] [DEFAULT] [assert ALLOWED VALUES]  [DOUBLESPACE DESCRIPTION]
 ######################
 # READ THE DOCSTRING 
 ####################
-
-
-#REGEX:
-#1:name #2:type #3:list?  #4: NOTHIG #5:defaultvalue
-#getgroups = re.compile( '--([\w]+) ?(\w+)?(\+)? ?(default:(.+))? ?')
-
 #NEW REGEX
 # 1:argname, 2:type 3:+ 4: default
 getgroups = re.compile('--([\w]+) (\w+)(\+)? ?(.+)?')
 
 def interpret_groups(argname, maker, islist, default, defaults, funcs, ass = []):
+
+    # bool("False") is True, so we need this:
+    makerf = eval(maker) if maker != 'bool' else boolbuilder
+
     
-    def boolbuilder(x=None):
-        if x in [None,'False']:
-            return False
-        if x in ["True"]:
-            return True
-        assert False, f"i dont know how to turn {x} into a bool"
-            
-
-    if maker == 'bool':
-        makerf= boolbuilder # bool("False") is true so we dont do that :) 
-    else:
-        makerf=eval(maker)
-
     if maker == 'eval': 
         funcs[argname] = lambda x: eval(" ".join(x))
         assert not ass, f'can not define value list here, change  dirtyopts for {argname}'
@@ -58,6 +43,8 @@ def interpret_groups(argname, maker, islist, default, defaults, funcs, ass = [])
         func = lambda x: makerf(x[0])
         funcs[argname]  = func if not ass else lambda z: checkass(ass,func,z, argname)
     
+
+
     if default:
         defaults[argname] = funcs[argname](default.split())  
     else:
@@ -68,8 +55,14 @@ def checkass(ass,func,z, arg):
     assert z[0] in ass, f"invalid argument \"{z[0]}\" for  argument {arg}"
     return func(z)
 
+def boolbuilder(x=None):
+    if x in [None,'False']:
+        return False
+    if x in ["True"]:
+        return True
+    assert False, f"i dont know how to turn {x} into a bool"
+        
     
-
 
 def docstrparser(docstring, debug):
     defaults={}
