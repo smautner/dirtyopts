@@ -3,10 +3,11 @@ import sys
 import logging
 doc='''
 i guess we write stuff like so:
-NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
+NAMEOFTHING [TYPE] [DEFAULT] [assert ALLOWED VALUES]  [DOUBLESPACE DESCRIPTION]
 
---myintarg int 12   blabla
+--myintarg int 12   comment
 --mystring str asd  blabla
+--mystring2 str asd assert asd asdf  comment
 --myfu eval lambda x:x.max()
 --another bool True
 --zomg int+
@@ -32,7 +33,7 @@ NAMEOFTHING [TYPE] [default: DEFAULT]  [DOUBLESPACE DESCRIPTION]
 # 1:argname, 2:type 3:+ 4: default
 getgroups = re.compile('--([\w]+) (\w+)(\+)? ?(.+)?')
 
-def interpret_groups(argname, maker, islist, default, defaults, funcs):
+def interpret_groups(argname, maker, islist, default, defaults, funcs, ass = []):
     
     def boolbuilder(x=None):
         if x in [None,'False']:
@@ -49,10 +50,13 @@ def interpret_groups(argname, maker, islist, default, defaults, funcs):
 
     if maker == 'eval': 
         funcs[argname] = lambda x: eval(" ".join(x))
+        assert not ass, f'can not define value list here, change  dirtyopts for {argname}'
     elif islist:
         funcs[argname]  = lambda x: list(map(makerf,x))
+        assert not ass, f'can not define value list for list, change dirtyops for {argname}'
     else:
-        funcs[argname]  = lambda x: makerf(x[0])
+        func = lambda x: makerf(x[0])
+        funcs[argname]  = func if not ass else lambda z: checkass(ass,func,z, argname)
     
     if default:
         defaults[argname] = funcs[argname](default.split())  
@@ -60,6 +64,11 @@ def interpret_groups(argname, maker, islist, default, defaults, funcs):
         defaults[argname] = makerf() if not islist else [makerf()]
 
 
+def checkass(ass,func,z, arg):
+    assert z[0] in ass, f"invalid argument \"{z[0]}\" for  argument {arg}"
+    return func(z)
+
+    
 
 
 def docstrparser(docstring, debug):
@@ -69,12 +78,16 @@ def docstrparser(docstring, debug):
         line= line.strip()
         if line and line[:2]=='--':
             line = line.split("  ")[0]
-            m=getgroups.match(line)
+
+            line = line.split(" assert ")
+            ass = line[1] if len(line) > 1 else []
+
+            m=getgroups.match(line[0])
             matched = [m.group(x) for x in [1,2,3,4]]
             if debug: 
                 print ("matches:", matched)
             
-            interpret_groups(*matched, defaults, argfun)
+            interpret_groups(*matched, defaults, argfun,ass)
             if debug: 
                 print ("default:", defaults[matched[0]] )
     # bool(None) is false so this is fine

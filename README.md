@@ -13,6 +13,7 @@ doc = '''
 
 # you need to provide a string for bool arguments because where is no special treatment for them
 >>>myprog --boolarg True   
+
 '''
 
 doc2 = '''
@@ -20,6 +21,9 @@ doc2 = '''
 --intargford2 int
 
 # also giving w1 as an arg will trigger verbose mode
+
+--mystring str asd assert str musst be one of theese 
+
 '''
 
 args = parse(doc)
