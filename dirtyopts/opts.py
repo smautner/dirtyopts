@@ -74,8 +74,13 @@ def docstrparser(docstring, debug):
 
             line = line.split(" assert ")
             ass = line[1] if len(line) > 1 else []
-
             m=getgroups.match(line[0])
+            if not m:
+                print(f"################")
+                print(f"dirtyargsfailed to understand: {line[0]}")
+                print(f"should be --argname type(+) default ASSERT things things")
+                print(f"################")
+                exit()
             matched = [m.group(x) for x in [1,2,3,4]]
             if debug: 
                 print ("matches:", matched)
