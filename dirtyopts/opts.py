@@ -118,8 +118,11 @@ def argparser(args, debug):
     if carg:
         cstuff = app(result,carg, cstuff)
     if debug:
+        print(f"I HAVE READ THE ARGS")
         print(args)
-        print(result)
+        print(f"AND BUILT THIS DICTIONARY:")
+        for k,v in result.items(): 
+            print(f"  '{k}': {v}")
     return result
 
 
@@ -134,7 +137,7 @@ class argz:
 
 def parse(docstring , args =  sys.argv[1:], debug=False):
     if "-h" in args or "--help" in args:
-        print (docstring)
+        print(docstring)
     if args and args[0] == 'w1':
         debug = True
         args = args[1:]
@@ -149,7 +152,7 @@ def parse(docstring , args =  sys.argv[1:], debug=False):
         else:
             assert v , f'given arg: "{arg}" is {v}  you musst give an explicit value!' 
             defaultargs[arg] = argfun[arg](v)
-            if debug: print (f"overwritining {arg}  got:{v}  ->: {defaultargs[arg]}")
+            if debug: print (f"overwriting {arg}  got:{v}  -> {defaultargs[arg]}")
 
     return argz(defaultargs)
 
