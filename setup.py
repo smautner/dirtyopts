@@ -99,15 +99,13 @@ setup(
     author='Stefan Mautner',
     author_email='myl4stn4m3stef@gmail.com',
     packages=[packname],
-    python_requires='>=3.4',
-    scripts=[ ],
+    python_requires='>=3.8',
     include_package_data=True,
     package_data={},
     url='https://github.com/smautner/dirtyopts',
     license='GPLv3',
     description='another opts parser',
     #long_description=open('README.md').read(),
-    install_requires=[ 
-        ],
+    install_requires=[ ],
     cmdclass={'sdist': sdist, 'install': install}
 )
