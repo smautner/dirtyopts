@@ -5,28 +5,29 @@
 from dirtyopts import parse
 
 doc = '''
-#--argname type[+ for list] [default]  [doublespace -> comment]
+#--NAMEOFTHING TYPE[+ for list] [DEFAULT] [assert ALLOWED VALUES]  [comment after 2 spaces :)]
 --intarg int+ 3 4 5  i am a comment
+--mystring str be assert mystring musst be one of these
 
-# nodefault means the default of the type 
+# no default value means the default of the type
 --strarg str  ->''
 
-# you need to provide a string for bool arguments because where is no special treatment for them
->>>myprog --boolarg True   
 
 '''
 
-doc2 = '''
-# i ignore unknown args so multiple args opbjects can be created neatly
---intargford2 int
+other_behaviour = '''
+# you can parse the args with multiple doc strings, as unknown args are ignored
+--intarg2 int
 
-# also giving w1 as an arg will trigger verbose mode
+# -h and --help will print this string
 
---mystring str asd assert str musst be one of theese 
+# giving w1 as first arg will trigger verbose mode for the parsing
 
+# you need to provide a string for bool arguments because where is no special treatment for them
+>>>myprog --boolarg True
 '''
 
 args = parse(doc)
-args2 = parse(doc2)
+args2 = parse(other_behaviour)
 ```
 
