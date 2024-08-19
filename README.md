@@ -1,4 +1,10 @@
 
+# Install:
+
+```
+pip install dirtyopts
+```
+
 # Usage:
 
 ```

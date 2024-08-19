@@ -105,7 +105,8 @@ setup(
     url='https://github.com/smautner/dirtyopts',
     license='GPLv3',
     description='another opts parser',
-    #long_description=open('README.md').read(),
+    long_description=open('README.md').read(),
+    long_description_content_type = 'text/markdown',
     install_requires=[ ],
     cmdclass={'sdist': sdist, 'install': install}
 )
