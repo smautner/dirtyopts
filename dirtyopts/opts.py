@@ -13,15 +13,13 @@ NAMEOFTHING [TYPE] [DEFAULT] [assert ALLOWED VALUES]  [DOUBLESPACE DESCRIPTION]
 --zomg int+
 --anotherf bool+ False False
 
-#--help and -h are SPECIAL NOW :) 
+#--help and -h are SPECIAL NOW :)
 #w1 at the beginning triggers debug mode
 '''
 
 
-
-
 ######################
-# READ THE DOCSTRING 
+# READ THE DOCSTRING
 ####################
 #NEW REGEX
 # 1:argname, 2:type 3:+ 4: default
@@ -32,23 +30,29 @@ def interpret_groups(argname, maker, islist, default, defaults, funcs, ass = [])
     # bool("False") is True, so we need this:
     makerf = eval(maker) if maker != 'bool' else boolbuilder
 
-    
-    if maker == 'eval': 
+
+    if maker == 'eval':
         funcs[argname] = lambda x: eval(" ".join(x))
         assert not ass, f'can not define value list here, change  dirtyopts for {argname}'
     elif islist:
-        funcs[argname]  = lambda x: list(map(makerf,x))
+        funcs[argname]  =  lambda x: list(map(makerf,x))
         assert not ass, f'can not define value list for list, change dirtyops for {argname}'
     else:
         func = lambda x: makerf(x[0])
         funcs[argname]  = func if not ass else lambda z: checkass(ass,func,z, argname)
-    
 
 
     if default:
-        defaults[argname] = funcs[argname](default.split())  
+        defaults[argname] = funcs[argname](default.split())
+    elif islist:
+        defaults[argname] = []
     else:
-        defaults[argname] = makerf() if not islist else [makerf()]
+        defaults[argname] = makerf()
+
+    # if default:
+    #     defaults[argname] = funcs[argname](default.split())
+    # else:
+    #     defaults[argname] = makerf() if not islist else [makerf()]
 
 
 def checkass(ass,func,z, arg):
@@ -61,8 +65,8 @@ def boolbuilder(x=None):
     if x in ["True"]:
         return True
     assert False, f"i dont know how to turn {x} into a bool"
-        
-    
+
+
 
 def docstrparser(docstring, debug):
     defaults={}
@@ -82,11 +86,11 @@ def docstrparser(docstring, debug):
                 print(f"################")
                 exit()
             matched = [m.group(x) for x in [1,2,3,4]]
-            if debug: 
+            if debug:
                 print ("matches:", matched)
-            
+
             interpret_groups(*matched, defaults, argfun,ass)
-            if debug: 
+            if debug:
                 print ("default:", defaults[matched[0]] )
     # bool(None) is false so this is fine
     return defaults, argfun
@@ -121,7 +125,7 @@ def argparser(args, debug):
         print(f"I HAVE READ THE ARGS")
         print(args)
         print(f"AND BUILT THIS DICTIONARY:")
-        for k,v in result.items(): 
+        for k,v in result.items():
             print(f"  '{k}': {v}")
     return result
 
@@ -142,7 +146,7 @@ def parse(docstring , args =  sys.argv[1:], debug=False):
         debug = True
         args = args[1:]
 
-    
+
     rawargs = argparser(args, debug)
     defaultargs, argfun = docstrparser(docstring, debug)
 
@@ -150,7 +154,7 @@ def parse(docstring , args =  sys.argv[1:], debug=False):
         if arg not in argfun:
             if debug: logging.warning(f"this docstring doesnt handle: {arg}")
         else:
-            assert v , f'given arg: "{arg}" is {v}  you musst give an explicit value!' 
+            assert v , f'given arg: "{arg}" is {v}  you musst give an explicit value!'
             defaultargs[arg] = argfun[arg](v)
             if debug: print (f"overwriting {arg}  got:{v}  -> {defaultargs[arg]}")
 
